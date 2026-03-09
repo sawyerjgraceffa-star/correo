@@ -259,26 +259,46 @@
         ::-webkit-scrollbar-thumb { background: var(--p-accent-soft); border-radius: 10px; }
 
         /* =========================================
-           7. REPARACIÓN PARA TELÉFONOS (MÓVIL)
+           7. SOLUCIÓN MÓVIL FORZADA
            ========================================= */
         @media (max-width: 900px) {
-            body { overflow-y: auto !important; }
+            body { 
+                overflow-x: hidden !important; 
+                overflow-y: auto !important; 
+                height: auto !important;
+            }
             #main-container {
+                display: none; /* Controlado por JS */
                 grid-template-columns: 1fr !important;
                 height: auto !important;
-                display: none; /* Se activa por JS igual que antes */
+                width: 100vw !important;
+                overflow: visible !important;
             }
             .sidebar, .mail-list, .mail-viewer, #calendar-view {
-                width: 100% !important;
+                width: 100vw !important;
                 height: auto !important;
-                min-height: 400px;
-                border-right: none !important;
-                border-bottom: 1px solid var(--p-border);
+                min-height: 50vh;
+                border: none !important;
+                display: flex !important; /* Forzamos que se vean */
+                position: relative !important;
             }
-            .view-header, .view-body, #calendar-view { padding: 40px 20px !important; }
-            .view-subject { font-size: 26px !important; margin-bottom: 20px; }
-            .gate-users { gap: 30px !important; }
-            .editor-modal { width: 100vw !important; right: 0 !important; border-radius: 0 !important; }
+            /* El visor de mensajes debe ser visible y no colapsar */
+            .mail-viewer {
+                min-height: 80vh !important;
+                background: white !important;
+            }
+            .view-header, .view-body {
+                padding: 40px 20px !important;
+            }
+            .view-subject {
+                font-size: 24px !important;
+            }
+            .view-body img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            .gate-users { gap: 20px !important; }
+            .editor-modal { width: 100vw !important; right: 0 !important; height: 100vh !important; border-radius: 0 !important; }
         }
     </style>
 </head>
@@ -545,6 +565,11 @@
             const vImg = document.getElementById('v-avatar');
             vImg.src = profileDbCache[m.from]?.pfp || '';
             applyPfpStyles(vImg, profileDbCache[m.from], 70);
+
+            // AUTO-SCROLL EN MÓVIL AL ABRIR UN MENSAJE
+            if(window.innerWidth < 900) {
+                document.querySelector('.mail-viewer').scrollIntoView({ behavior: 'smooth' });
+            }
         };
 
         window.logicSendMail = () => {
